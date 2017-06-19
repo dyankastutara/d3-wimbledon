@@ -2,17 +2,16 @@
 
 // Our canvas
 const width = 750,
-  height = 300,
-  margin = 20,
+height = 300,
+margin = 20,
 marginLeft = 40
 
 // Drawing area
 
 let svg = d3.select('#results')
-  .append('svg')
-  .attr('width', width)
-  .attr('height', height)
-  .attr('margin-left', marginLeft)
+.append('svg')
+.attr('width', width)
+.attr('height', height)
 // Data reloading
 let reload = () => {
   // Your data parsing here..
@@ -38,27 +37,49 @@ let redraw = (data) => {
   .domain([0, d3.max(data)])
   .range([0, height])
 
-  const xScale = d3.scaleLinear()
-  .domain([0, data.length])
-  .range([0, width])
+  const colorScale = d3.scaleLinear()
+    .domain([0, d3.max(data)])
+    .range(['peru', 'teal'])
 
-  const xAxis = d3.axisBottom().scale(xScale).ticks(data.length)
-  var yAxis = d3.axisRight().scale(yScale).ticks(d3.max(data));
+  var xscale = d3.scaleLinear()
+  .domain([0, data.length])
+  .range([0, width - 100]);
+
+  var yscale = d3.scaleLinear()
+  .domain([0, d3.max(data)])
+  .range([height, 0]);
+
+  var x_axis = d3.axisBottom()
+  .scale(xscale);
+
+  var y_axis = d3.axisLeft()
+  .scale(yscale);
+
+  svg.append("g")
+  .attr("transform", "translate(50, 10)")
+  .call(y_axis);
+
+  svg.append("g")
+  .attr("transform", "translate(50,0)")
+  .call(x_axis)
 
   svg.selectAll('rect')
   .data(data)
   .enter()
   .append('rect')
   .attr('fill', 'teal')
-  .attr('x', (d, i)=>{ return i*17})
-  .attr('y', (d, i)=>{ return height - yScale(d)})
-  .attr('width', 15)
-  .attr('height', (d)=>{return yScale(d)})
+  .attr("transform", "translate(50, 10)")
 
-  svg.append('g')
-  .call(xAxis);
-  svg.append('g')
-  .call(yAxis);
+  .attr('x', (d, i)=>{ return i*14})
+  .attr('y', (d, i)=>{ return height - yScale(d)})
+  .attr('width', 13)
+  .attr('height', (d)=>{return yScale(d)})
+  .on('mouseover', function (d, index) {
+    d3.select(this).style('fill', '#000000')
+  })
+  .on('mouseout', function (d, index) {
+    d3.select(this).style('fill', 'teal')
+  })
 
 }
 
